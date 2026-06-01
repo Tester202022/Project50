@@ -1,0 +1,6 @@
+{
+  "name": "SouPlastic ERP",
+  "description": "Sistema de gestão industrial completo para SouPlastic, com controle de estoque, pedidos, financeiro e monitoramento de produção em tempo real com rastreamento de ritmo.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

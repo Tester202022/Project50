@@ -1,0 +1,512 @@
+{
+  "entities": {
+    "StockItem": {
+      "title": "StockItem",
+      "description": "Item no estoque da fábrica",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number", "description": "ID numérico do item" },
+        "name": { "type": "string", "description": "Nome do material" },
+        "quantity": { "type": "number", "description": "Quantidade atual" },
+        "minQuantity": { "type": "number", "description": "Quantidade mínima de segurança" },
+        "supplier": { "type": "string", "description": "Fornecedor" },
+        "category": { "type": "string", "description": "Categoria do material" },
+        "unit": { "type": "string", "description": "Unidade de medida (kg, L, etc)" }
+      },
+      "required": ["name", "quantity", "minQuantity", "category"]
+    },
+    "Client": {
+      "title": "Client",
+      "description": "Cliente da fábrica",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "ID do cliente" },
+        "name": { "type": "string", "description": "Razão Social" },
+        "fantasyName": { "type": "string", "description": "Nome Fantasia" },
+        "cnpj": { "type": "string", "description": "CNPJ" },
+        "address": { "type": "string", "description": "Endereço" },
+        "cep": { "type": "string", "description": "CEP" },
+        "city": { "type": "string", "description": "Cidade" },
+        "phone": { "type": "string", "description": "Telefone" },
+        "email": { "type": "string", "description": "Email" },
+        "historyResetDate": { "type": "string", "format": "date-time", "description": "Data do último zeramento de histórico" }
+      },
+      "required": ["name", "cnpj", "address", "phone"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Produto fabricado",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Código do produto" },
+        "name": { "type": "string", "description": "Nome do produto" },
+        "type": { "type": "string", "enum": ["Sacola", "Saco", "Envelope", "Bobina"] },
+        "width": { "type": "number" },
+        "height": { "type": "number" },
+        "micra": { "type": "number" },
+        "color": { "type": "string" },
+        "weightPerThousand": { "type": "number" },
+        "extrusion": { "type": "string" },
+        "cutting": { "type": "string" },
+        "materialMix": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "materialId": { "type": "number" },
+              "percentage": { "type": "number" }
+            }
+          }
+        }
+      },
+      "required": ["id", "name", "type"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Pedido de venda",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number" },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "items": { "type": "array" },
+        "totalValue": { "type": "number" },
+        "totalWeight": { "type": "number" },
+        "status": { "type": "string", "enum": ["Pendente", "Em Produção", "Pronto", "Expedição", "Entregue"] },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["clientId", "items", "status", "date"]
+    },
+    "Label": {
+      "title": "Label",
+      "description": "Etiqueta de volume/lote (Matéria Prima ou Bobina)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "materialId": { "type": "string" },
+        "materialName": { "type": "string" },
+        "weight": { "type": "number" },
+        "unit": { "type": "string" },
+        "supplier": { "type": "string" },
+        "batchNumber": { "type": "string" },
+        "status": { "type": "string", "enum": ["Disponível", "Consumido"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "consumedAt": { "type": "string", "format": "date-time" },
+        "width": { "type": "number" },
+        "micra": { "type": "number" },
+        "color": { "type": "string" },
+        "type": { "type": "string", "enum": ["MateriaPrima", "Bobina"] },
+        "opId": { "type": "string" }
+      },
+      "required": ["id", "status", "createdAt"]
+    },
+    "FinanceItem": {
+      "title": "FinanceItem",
+      "description": "Lançamento financeiro",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number" },
+        "orderNumber": { "type": "string" },
+        "invoiceNumber": { "type": "string" },
+        "description": { "type": "string" },
+        "value": { "type": "number" },
+        "dueDate": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["Pago", "Pendente"] },
+        "type": { "type": "string", "enum": ["Receber", "Pagar"] },
+        "category": { "type": "string" },
+        "proofName": { "type": "string" }
+      },
+      "required": ["description", "value", "dueDate", "status", "type"]
+    },
+    "ProductionOP": {
+      "title": "ProductionOP",
+      "description": "Ordem de Produção",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "orderId": { "type": "number" },
+        "client": { "type": "string" },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "productType": { "type": "string" },
+        "quantity": { "type": "number" },
+        "finishedQuantity": { "type": "number" },
+        "targetWeight": { "type": "number" },
+        "extrusion": { "type": "string" },
+        "cutting": { "type": "string" },
+        "status": { "type": "string", "enum": ["Extrusão", "Impressão", "Corte/Solda", "Expedição", "Finalizado", "Entregue"] },
+        "photoUrl": { "type": "string" },
+        "history": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "finishedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "orderId", "status", "createdAt"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Usuário do sistema",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "uid": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    },
+    "SystemLog": {
+      "title": "SystemLog",
+      "description": "Log de movimentações do sistema",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "action": { "type": "string", "description": "Tipo de ação (ex: Entrada de Pedido, Baixa de Item)" },
+        "details": { "type": "string", "description": "Detalhes da ação" },
+        "userEmail": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "category": { "type": "string", "enum": ["Pedido", "Produção", "Estoque", "Financeiro", "Cliente", "Produto"] }
+      },
+      "required": ["action", "details", "timestamp", "category"]
+    },
+    "DailyProduction": {
+      "title": "DailyProduction",
+      "description": "Registro de produção diária por área",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "area": { "type": "string", "enum": ["EXTRUSÃO", "FLEXOGRAFIA", "CORTE", "EXPEDIÇÃO"] },
+        "title": { "type": "string" },
+        "goalQuantity": { "type": "number" },
+        "currentQuantity": { "type": "number" },
+        "status": { "type": "string", "enum": ["Ativo", "Pausado", "Finalizado"] },
+        "startTime": { "type": "string", "format": "date-time" },
+        "endTime": { "type": "string", "format": "date-time" },
+        "estimatedEndTime": { "type": "string", "format": "date-time" },
+        "productionRate": { "type": "number", "description": "Unidades por segundo" },
+        "logs": {
+          "type": "array",
+          "items": {
+             "type": "object",
+             "properties": {
+               "timestamp": { "type": "string", "format": "date-time" },
+               "count": { "type": "number" }
+             }
+          }
+        }
+      },
+      "required": ["area", "title", "goalQuantity", "status", "startTime"]
+    },
+    "Quote": {
+      "title": "Quote",
+      "description": "Orçamento para cliente",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "quoteNumber": { "type": "string" },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "clientCnpj": { "type": "string" },
+        "clientPhone": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "items": { "type": "array" },
+        "totalValue": { "type": "number" },
+        "deliveryTime": { "type": "string" },
+        "paymentTerms": { "type": "string" },
+        "signalAmount": { "type": "string" },
+        "validity": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pendente", "Aprovado", "Recusado"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["quoteNumber", "clientId", "clientName", "items", "status", "createdAt"]
+    },
+    "DeliveryNote": {
+      "title": "DeliveryNote",
+      "description": "Registro histórico de uma entrega parcial ou total",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "orderId": { "type": "string" },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "totalValue": { "type": "number" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "productId": { "type": "string" },
+              "productName": { "type": "string" },
+              "quantity": { "type": "number" },
+              "unitPrice": { "type": "number" }
+            }
+          }
+        }
+      },
+      "required": ["orderId", "clientName", "date", "totalValue", "items"]
+    },
+    "Reminder": {
+      "title": "Reminder",
+      "description": "Lembretes e avisos via Telegram",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "type": { "type": "string", "enum": ["LEMBRETE", "COMPROMISSO", "TAREFA"] },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pendente", "Concluído"] },
+        "remindersSent": {
+          "type": "object",
+          "properties": {
+            "first": { "type": "boolean" },
+            "second": { "type": "boolean" },
+            "atTime": { "type": "boolean" }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "type", "date", "status", "createdAt"]
+    },
+    "ReminderSettings": {
+      "title": "ReminderSettings",
+      "description": "Configurações do Bot do Telegram",
+      "type": "object",
+      "properties": {
+        "telegramBotToken": { "type": "string" },
+        "notificationContacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "telegramChatId": { "type": "string" },
+              "active": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "ProductionLog": {
+      "title": "ProductionLog",
+      "description": "Registro de baixa individual para relatório diário",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "opId": { "type": "string" },
+        "orderId": { "type": "string" },
+        "productName": { "type": "string" },
+        "client": { "type": "string" },
+        "quantity": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "date": { "type": "string", "format": "date" }
+      },
+      "required": ["id", "opId", "quantity", "timestamp", "date"]
+    },
+    "Boleto": {
+      "title": "Boleto",
+      "description": "Registro de boleto gerado via Asaas",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "asaasId": { "type": "string" },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "value": { "type": "number" },
+        "dueDate": { "type": "string", "format": "date" },
+        "description": { "type": "string" },
+        "bankSlipUrl": { "type": "string", "format": "uri" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "financeItemId": { "type": "string" }
+      },
+      "required": ["asaasId", "clientId", "clientName", "value", "dueDate", "bankSlipUrl", "status", "createdAt"]
+    },
+    "NotaFiscal": {
+      "title": "NotaFiscal",
+      "description": "Registro de nota fiscal gerada via NotaaS",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "notaasId": { "type": "string" },
+        "orderId": { "type": "string" },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "status": { "type": "string" },
+        "link": { "type": "string" },
+        "numero": { "type": "string" },
+        "valor": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["notaasId", "orderId", "clientId", "status", "createdAt"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Registro de pagamento recebido",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "amount": { "type": "number" },
+        "date": { "type": "string", "format": "date" },
+        "method": { "type": "string", "enum": ["PIX", "Boleto", "Dinheiro", "Transferência", "Cartão", "AJUSTE"] },
+        "observation": { "type": "string" },
+        "orderId": { "type": "string" }
+      },
+      "required": ["clientId", "amount", "date", "method"]
+    },
+    "EmailSettings": {
+      "title": "EmailSettings",
+      "description": "Configurações de E-mail (Gmail/SMTP)",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "appPassword": { "type": "string" },
+        "smtpHost": { "type": "string" },
+        "smtpPort": { "type": "number" }
+      }
+    },
+    "OrderActivity": {
+      "title": "OrderActivity",
+      "description": "Log de atividade individual de um pedido",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "user": { "type": "string" }
+      },
+      "required": ["title", "description", "timestamp"]
+    },
+    "CostItem": {
+      "title": "CostItem",
+      "description": "Item de custo fixo ou variável mensal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "description": "Nome do custo (ex: Energia Elétrica)" },
+        "value": { "type": "number", "description": "Valor mensal" },
+        "category": { "type": "string", "enum": ["Utilidade", "Mão de Obra", "Aluguel", "Logística", "Administrativo", "Outros"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "value", "category"]
+    },
+    "OperationSettings": {
+      "title": "OperationSettings",
+      "description": "Configurações de operação da fábrica para cálculo de custos",
+      "type": "object",
+      "properties": {
+        "workDaysPerMonth": { "type": "number", "description": "Dias trabalhados por mês" },
+        "workHoursPerDay": { "type": "number", "description": "Horas trabalhadas por dia" },
+        "resinPricePerKg": { "type": "number", "description": "Preço médio da resina por Kg" },
+        "productionCapacityPerHour": { "type": "number", "description": "Capacidade média de produção em Kg/hora" }
+      }
+    },
+    "PricingGroup": {
+      "title": "PricingGroup",
+      "description": "Grupos de precificação com fatores pré-definidos",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "description": "Nome do grupo (ex: Grupo 1 - Varejo)" },
+        "factor": { "type": "number", "description": "Multiplicador fixo para o grupo" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "factor"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Perfil de usuário operacional",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["Administrador", "Vendedor", "Produção"] },
+        "pin": { "type": "string" },
+        "permissions": {
+          "type": "object",
+          "properties": {
+            "showMonetaryValues": { "type": "boolean" },
+            "viewFiscal": { "type": "boolean" },
+            "viewFinance": { "type": "boolean" },
+            "viewStock": { "type": "boolean" },
+            "viewClients": { "type": "boolean" },
+            "viewOrders": { "type": "boolean" },
+            "viewProduction": { "type": "boolean" },
+            "viewQuotes": { "type": "boolean" },
+            "viewSettings": { "type": "boolean" }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "role", "createdAt"]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "Log de atividades auditável por perfil",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "action": { "type": "string" },
+        "category": { "type": "string" },
+        "details": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["action", "userName", "timestamp"]
+    },
+    "Connection": {
+      "title": "Connection",
+      "description": "Ligação cruzada de sócios CNPJ/CPF",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "cnpj": { "type": "string" },
+        "companyName": { "type": "string" },
+        "fantasyName": { "type": "string" },
+        "ownerName": { "type": "string" },
+        "ownerCpf": { "type": "string" },
+        "phones": { "type": "array", "items": { "type": "string" } },
+        "emails": { "type": "array", "items": { "type": "string" } },
+        "address": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["cnpj", "companyName", "ownerName", "ownerCpf", "phones", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/stock/{itemId}": { "schema": "StockItem", "description": "Itens de estoque" },
+    "/clients/{clientId}": { "schema": "Client", "description": "Clientes" },
+    "/products/{productId}": { "schema": "Product", "description": "Produtos" },
+    "/labels/{labelId}": { "schema": "Label", "description": "Etiquetas de lote" },
+    "/orders/{orderId}": { "schema": "Order", "description": "Pedidos" },
+    "/orders/{orderId}/activity/{activityId}": { "schema": "OrderActivity", "description": "Logs de atividade do pedido" },
+    "/finance/{financeId}": { "schema": "FinanceItem", "description": "Financeiro" },
+    "/production/{opId}": { "schema": "ProductionOP", "description": "Ordens de produção" },
+    "/users/{userId}": { "schema": "User", "description": "Usuários e permissões" },
+    "/system_logs/{logId}": { "schema": "SystemLog", "description": "Logs de auditoria e movimentação" },
+    "/daily_production/{id}": { "schema": "DailyProduction", "description": "Registros de produção diária" },
+    "/quotes/{quoteId}": { "schema": "Quote", "description": "Orçamentos" },
+    "/delivery_notes/{id}": { "schema": "DeliveryNote", "description": "Histórico de entregas" },
+    "/reminders/{id}": { "schema": "Reminder", "description": "Lembretes e avisos" },
+    "/settings/reminders": { "schema": "ReminderSettings", "description": "Configurações de notificações" },
+    "/settings/email": { "schema": "EmailSettings", "description": "Configurações de E-mail" },
+    "/settings/operation": { "schema": "OperationSettings", "description": "Configurações de operação da fábrica" },
+    "/costs/{costId}": { "schema": "CostItem", "description": "Lançamentos de custos fixos" },
+    "/production_logs/{logId}": { "schema": "ProductionLog", "description": "Histórico detalhado de produção diária" },
+    "/boletos/{id}": { "schema": "Boleto", "description": "Histórico de boletos Asaas" },
+    "/invoices/{id}": { "schema": "NotaFiscal", "description": "Histórico de notas fiscais NotaaS" },
+    "/payments/{id}": { "schema": "Payment", "description": "Registro de pagamentos recebidos" },
+    "/pricing_groups/{id}": { "schema": "PricingGroup", "description": "Grupos de precificação" },
+    "/profiles/{id}": { "schema": "UserProfile", "description": "Perfis de usuários operacionais" },
+    "/activities/{id}": { "schema": "ActivityLog", "description": "Histórico de atividades por perfil" },
+    "/connections/{id}": { "schema": "Connection", "description": "Ligações e cruzamentos de sócios e telefones" }
+  }
+}
